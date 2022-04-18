@@ -1,12 +1,17 @@
-import express, { Request, Response, Router } from "express";
+import { Request, Response } from "express";
 
-const router: Router = express.Router();
-
-router.get("/post", (req: Request, res: Response) => {
+const selectPost = (req: Request, res: Response) => {
   return res.status(200).json({
     status: 200,
     message: "포스팅 조회 성공",
   });
-});
+};
 
-export default router;
+const likePost = (req: Request, res: Response) => {
+  return res.status(200).json({
+    status: 201,
+    message: "좋아요 성공",
+  });
+};
+
+export { selectPost, likePost };
