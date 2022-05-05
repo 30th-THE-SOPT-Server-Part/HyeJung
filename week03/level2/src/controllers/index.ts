@@ -1,5 +1,7 @@
-import UserController from "./UserController"
+import UserController from "./UserController";
+import BlogController from "./BlogController";
 
 export {
-    UserController
+    UserController,
+    BlogController
 }
