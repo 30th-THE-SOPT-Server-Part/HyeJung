@@ -11,7 +11,7 @@ import { BlogService } from "../services";
  * @desc Create Blog
  * @access Public
  */
-const createPost = async (req: Request, res: Response) => {
+const createPost = async (req: Request, res: Response): Promise<void | Response> => {
     const blogCreateDto: BlogCreateDto = req.body;
     if(!blogCreateDto){
         return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST));
@@ -30,7 +30,7 @@ const createPost = async (req: Request, res: Response) => {
  * @desc update Blog
  * @access Public
  */
-const updatePost = async (req: Request, res: Response) => {
+const updatePost = async (req: Request, res: Response): Promise<void | Response> => {
     const { postId } = req.params;
     let blogUpdateDto: BlogUpdateDto = req.body;
     blogUpdateDto.updateAt = new Date();
@@ -48,7 +48,7 @@ const updatePost = async (req: Request, res: Response) => {
  * @desc Read Blog
  * @access Public
  */
-const findPostById = async (req: Request, res: Response) => {
+const findPostById = async (req: Request, res: Response): Promise<void | Response> => {
     const { postId } = req.params;
     try {
         const data = await BlogService.findPostById(postId);
@@ -67,7 +67,7 @@ const findPostById = async (req: Request, res: Response) => {
  * @desc Delete Blog
  * @access Public
  */
-const deletePost = async (req: Request, res: Response) => {
+const deletePost = async (req: Request, res: Response): Promise<void | Response> => {
     const { postId } = req.params;
     
     try {

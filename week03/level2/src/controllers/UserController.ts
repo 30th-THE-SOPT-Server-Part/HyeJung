@@ -11,7 +11,7 @@ import UserService from "../services/UserService";
  * @desc Create User
  * @access Public
  */
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response): Promise<void | Response> => {
     const userCreateDto: UserCreateDto = req.body;
 
     try {
@@ -38,7 +38,7 @@ const createUser = async (req: Request, res: Response) => {
  * @desc Update User
  * @access Public
  */
-const updateUser = async (req: Request, res: Response) => {
+const updateUser = async (req: Request, res: Response): Promise<void | Response> => {
     const { userId } = req.params;
     const userUpdateDto: UserUpdateDto = req.body;
 
@@ -56,7 +56,7 @@ const updateUser = async (req: Request, res: Response) => {
  * @desc Read User
  * @access Public
  */
- const findUserById = async (req: Request, res: Response) => {
+ const findUserById = async (req: Request, res: Response): Promise<void | Response> => {
     const { userId } = req.params;
 
     try {
@@ -78,7 +78,7 @@ const updateUser = async (req: Request, res: Response) => {
  * @desc Delete User
  * @access Public
  */
-const deleteUser = async (req: Request, res: Response) => {
+const deleteUser = async (req: Request, res: Response): Promise<void | Response> => {
     const { userId } = req.params;
     
     try {
