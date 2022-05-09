@@ -9,7 +9,7 @@ const message = {
     CREATE_USER_SUCCESS: '유저 생성 성공',
     DELETE_USER_SUCCESS: '유저 삭제 성공',
     UPDATE_USER_SUCCESS: '유저 수정 성공',
-    // IS_EXIST_USER: '이미 존재하는 유저',
+    IS_EXIST_USER: '이미 존재하는 유저',
 
     // 블로그 기능
     CREATE_POSTING_SUCCESS: '블로그 글 추가 성공',

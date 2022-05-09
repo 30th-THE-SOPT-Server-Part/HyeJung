@@ -4,6 +4,17 @@ import { UserResponseDto } from "../interface/user/UserResponseDto"
 import { UserUpdateDto } from "../interface/user/UserUpdateDto";
 import User from "../models/User";
 
+const existUser = async (email: string) : Promise<Boolean> => {
+    try {
+        const user = await User.findOne({ email: email });
+
+        return user ? true : false;
+    } catch(error) {
+        console.log(error);
+        throw error;
+    }
+} 
+
 const createUser = async (userCreateDto: UserCreateDto): Promise<PostBaseResponseDto> => {
     try {
         const user = new User(userCreateDto);
@@ -53,6 +64,7 @@ const deleteUser = async (userId: string): Promise<void> => {
 }
 
 export default {
+    existUser,
     createUser,
     updateUser,
     findUserById,

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { UserCreateDto } from "../interface/user/UserCreateDto";
 import { UserUpdateDto } from "../interface/user/UserUpdateDto";
-// import { validationResult } from "express-validator";
 import message from "../modules/responseMessage";
 import statusCode from "../modules/statusCode";
 import util from "../modules/util";
@@ -16,13 +15,20 @@ const createUser = async (req: Request, res: Response) => {
     const userCreateDto: UserCreateDto = req.body;
 
     try {
+        //이미 존재하는 유저인지 확인
+        const isExist = await UserService.existUser(userCreateDto.email);
+        if (isExist) {
+            return res.status(statusCode.BAD_REQUEST).send(
+                util.fail(statusCode.BAD_REQUEST, message.IS_EXIST_USER)
+            );
+        }
+
         const data = await UserService.createUser(userCreateDto);
-        res.status(statusCode.CREATED).send(
+        return res.status(statusCode.CREATED).send(
             util.success(statusCode.CREATED, message.CREATE_USER_SUCCESS, data)
         );
     } catch(error) {
         console.log(error);
-        // next(error);
         res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR,message.INTERNAL_SERVER_ERROR));
     }
 };
