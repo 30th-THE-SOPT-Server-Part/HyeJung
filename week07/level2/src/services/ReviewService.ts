@@ -27,7 +27,7 @@ const createReview = async (ReviewId: string, reviewCreateDto: ReviewCreateDto):
     }
 }
 
-const getReviews = async (movieId: string, search: string, option: ReviewOptionType, page: number): Promise<ReviewResponseDto[]> => {
+const getReviews = async (movieId: string,  page: number, search?: string, option?: ReviewOptionType): Promise<ReviewResponseDto[]> => {
     const regex = (pattern: string) => new RegExp(`.*${pattern}.*`);
 
     let reviews: ReviewInfo[] = [];
@@ -35,30 +35,41 @@ const getReviews = async (movieId: string, search: string, option: ReviewOptionT
 
     try {
         const pattern = regex(search);
-
-        if (option === 'title') {
-            reviews = await Review.find({ title: { $regex: pattern }})
+        
+        if (search && option) {
+            switch (option) {
+                case 'title': 
+                    reviews = await Review.find({ title: { $regex: pattern }})
+                                        .where('movie').equals(movieId)
+                                        .sort({ createdAt: -1 })
+                                        .skip(perPage * (page - 1))
+                                        .limit(perPage);
+                    break;
+                case 'content':
+                    reviews = await Review.find({ director: { $regex: pattern }})
+                                        .where('movie').equals(movieId)
+                                        .sort({ createdAt: -1 })
+                                        .skip(perPage * (page - 1) )
+                                        .limit(perPage);
+                    break;
+                default:
+                    reviews = await Review.find({
+                        $or: [
+                            { title: { $regex: pattern } },
+                            { director: { $regex: pattern } }
+                        ]
+                    })
+                    .where('movie').equals(movieId)
+                    .sort({ createdAt: -1 })
+                    .skip(perPage * (page - 1))
+                    .limit(perPage);
+            }
+        } else {
+            reviews = await Review.find()
                                 .where('movie').equals(movieId)
                                 .sort({ createdAt: -1 })
                                 .skip(perPage * (page - 1))
                                 .limit(perPage);
-        } else if (option === 'content') {
-            reviews = await Review.find({ director: { $regex: pattern }})
-                                .where('movie').equals(movieId)
-                                .sort({ createdAt: -1 })
-                                .skip(perPage * (page - 1) )
-                                .limit(perPage);
-        } else {
-            reviews = await Review.find({
-                $or: [
-                    { title: { $regex: pattern } },
-                    { director: { $regex: pattern } }
-                ]
-            })
-            .where('movie').equals(movieId)
-            .sort({ createdAt: -1 })
-            .skip(perPage * (page - 1))
-            .limit(perPage);
         }
 
         const total: number = await Review.countDocuments({ movie: movieId }); //movieId에 대한 개수
