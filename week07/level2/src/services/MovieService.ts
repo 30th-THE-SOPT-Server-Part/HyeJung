@@ -4,6 +4,7 @@ import { MovieCommentUpdateDto } from "../interface/movie/MovieCommentUpdateDto"
 import { MovieCreateDto } from "../interface/movie/MovieCreateDto";
 import { MovieCommentInfo, MovieInfo } from "../interface/movie/MovieInfo";
 import { MovieOptionType } from "../interface/movie/MovieOptionType";
+import { MoviesResponseDto } from "../interface/movie/MoviesResponseDto";
 import Movie from "../models/Movie";
 
 const createMovie = async (movieCreateDto: MovieCreateDto): Promise<PostBaseResponseDto> => {
@@ -55,35 +56,45 @@ const getMovie = async (movieId: string) => {
     }
 }
 
-const getMoviesBySearch = async (search: string, option: MovieOptionType, page: number): Promise<MoviesResponseDto[]> => {
+const getMoviesBySearch = async (page: number, search?: string, option?: MovieOptionType): Promise<MoviesResponseDto[]> => {
     const regex = (pattern: string) => new RegExp(`.*${pattern}.*`);
 
     let movies: MovieInfo[] = [];
     const perPage: number = 2;
 
     try {
-        const titleRegex = regex(search);
+        const pattern = regex(search);
 
-        if (option === 'title') {
-            movies = await Movie.find({ title: { $regex: titleRegex }})
+        if (search && option) {
+            switch(option) {
+                case 'title':
+                    movies = await Movie.find({ title: { $regex: pattern }})
                                 .sort({ createdAt: -1 }) //최신순 정렬
                                 .skip(perPage * (page - 1)) //앞에서부터 몇개 건너뛸지
                                 .limit(perPage);
-        } else if (option === 'director') {
-            movies = await Movie.find({ director: { $regex: titleRegex }})
-                                .sort({ createdAt: -1 })
-                                .skip(perPage * (page - 1) )
-                                .limit(perPage);
+                    break;
+                case 'director':
+                    movies = await Movie.find({ director: { $regex: pattern }})
+                                        .sort({ createdAt: -1 })
+                                        .skip(perPage * (page - 1) )
+                                        .limit(perPage);
+                    break;
+                default:
+                    movies = await Movie.find({
+                        $or: [
+                            { title: { $regex: pattern } },
+                            { director: { $regex: pattern } }
+                        ]
+                    })
+                    .sort({ createdAt: -1 })
+                    .skip(perPage * (page - 1))
+                    .limit(perPage); 
+            }
         } else {
-            movies = await Movie.find({
-                $or: [
-                    { title: { $regex: titleRegex } },
-                    { director: { $regex: titleRegex } }
-                ]
-            })
-            .sort({ createdAt: -1 })
-            .skip(perPage * (page - 1))
-            .limit(perPage);
+            movies = await Movie.find()
+                                .sort({ createdAt: -1 }) //최신순 정렬
+                                .skip(perPage * (page - 1)) //앞에서부터 몇개 건너뛸지
+                                .limit(perPage);
         }
 
         const total: number = await Movie.countDocuments({}); //모든 모큐먼트(row) 수
