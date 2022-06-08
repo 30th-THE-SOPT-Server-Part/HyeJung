@@ -1,4 +1,4 @@
 export interface FileInfo {
-    link: String;
-    fileName: String;
+    link: string;
+    fileName: string;
 };
