@@ -56,16 +56,15 @@ const getMovie = async (movieId: string) => {
     }
 }
 
-const getMoviesBySearch = async (page: number, search?: string, option?: MovieOptionType): Promise<MoviesResponseDto[]> => {
+const getMoviesBySearch = async (page: number, search?: string, option?: MovieOptionType): Promise<MoviesResponseDto> => {
     const regex = (pattern: string) => new RegExp(`.*${pattern}.*`);
 
     let movies: MovieInfo[] = [];
     const perPage: number = 2;
 
     try {
-        const pattern = regex(search);
-
         if (search && option) {
+            const pattern = regex(search);
             switch(option) {
                 case 'title':
                     movies = await Movie.find({ title: { $regex: pattern }})

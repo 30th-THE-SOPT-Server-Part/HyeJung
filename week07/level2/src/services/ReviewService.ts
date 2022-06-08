@@ -2,7 +2,7 @@ import { PostBaseResponseDto } from "../interface/common/PostBaseResponseDto";
 import { ReviewCreateDto } from "../interface/review/ReviewCreateDto";
 import { ReviewInfo } from "../interface/review/ReviewInfo";
 import { ReviewOptionType } from "../interface/review/ReviewOptionType";
-import { ReviewResponseDto } from "../interface/review/ReviewResponseDto";
+import { ReviewsResponseDto } from "../interface/review/ReviewsResponseDto";
 import Review from "../models/Review";
 
 const createReview = async (ReviewId: string, reviewCreateDto: ReviewCreateDto): Promise<PostBaseResponseDto> => {
@@ -27,16 +27,16 @@ const createReview = async (ReviewId: string, reviewCreateDto: ReviewCreateDto):
     }
 }
 
-const getReviews = async (movieId: string,  page: number, search?: string, option?: ReviewOptionType): Promise<ReviewResponseDto[]> => {
+const getReviews = async (movieId: string,  page: number, search?: string, option?: ReviewOptionType): Promise<ReviewsResponseDto> => {
     const regex = (pattern: string) => new RegExp(`.*${pattern}.*`);
 
     let reviews: ReviewInfo[] = [];
     const perPage: number = 2;
 
     try {
-        const pattern = regex(search);
-        
         if (search && option) {
+            const pattern = regex(search);
+            
             switch (option) {
                 case 'title': 
                     reviews = await Review.find({ title: { $regex: pattern }})
@@ -75,7 +75,7 @@ const getReviews = async (movieId: string,  page: number, search?: string, optio
         const total: number = await Review.countDocuments({ movie: movieId }); //movieId에 대한 개수
         const lastPage: number = Math.ceil(total / perPage);
 
-        return { reviews, lastPage };
+        return { lastPage, reviews };
     } catch (error) {
         console.log(error);
         throw error;
